@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const pdfParse = require("pdf-parse")
+const pdfParse = require("pdf-parse");
+const natural = require("natural");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage }); 
@@ -31,7 +32,7 @@ router.post("/analyze", upload.single("resume"), async (req, res) => {
 
     // Run ATS Scoring Algorithms
     const keywordScore = keywordMatching(resumeText, jobDescription);
-    const tfidfScore = tfidfMatching(resumeText, jobDescription);
+    const tfidfScore = tfidfScoring(resumeText, jobDescription);
     const semanticScore = semanticSimilarity(resumeText, jobDescription);
 
     res.json({
@@ -49,8 +50,25 @@ function keywordMatching(resume, job) {
     return Math.round((matchCount / jobWords.length) * 100);
 }
 
-function tfidfMatching(resume, job) {
-    return Math.random() * 100; // Placeholder for TF-IDF logic
+function tfidfScoring(resume, job) {
+    const TfIdf = natural.TfIdf;
+    const tfidf = new TfIdf();
+
+    tfidf.addDocument(job.toLowerCase());
+    tfidf.addDocument(resume.toLowerCase());
+
+    let totalScore = 0;
+    let keywords = job.toLowerCase().split(/\s+/);
+
+    keywords.forEach(word => {
+        tfidf.tfidfs(word, (docIndex, measure) => {
+            if (docIndex === 1) { // Resume is the second document
+                totalScore += measure;
+            }
+        });
+    });
+
+    return Math.round((totalScore / keywords.length) * 100);
 }
 
 function semanticSimilarity(resume, job) {
