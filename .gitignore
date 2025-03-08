@@ -27,3 +27,21 @@ build/
 
 # Ignore uploads (if any)
 uploads/
+
+# Ignore Python virtual environment
+venv/
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore node_modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore environment variables
+.env
+.DS_Store
+
