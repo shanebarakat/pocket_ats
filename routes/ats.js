@@ -4,7 +4,7 @@ const multer = require("multer");
 const pdfParse = require("pdf-parse")
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ storage }); 
 
 
 

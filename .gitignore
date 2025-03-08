@@ -4,7 +4,7 @@ node_modules/
 # Ignore environment variables (sensitive data)
 .env
 
-# Ignore logs
+# Ignore logs 
 npm-debug.log
 yarn-debug.log
 yarn-error.log

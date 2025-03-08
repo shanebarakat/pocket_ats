@@ -9,7 +9,7 @@ app.use(cors());
 
 
 const atsRoutes = require("./routes/ats");
-app.use("/api/ats", atsRoutes);
+app.use("/api/ats", atsRoutes); 
 
 app.get("/", (req,res) => {
   res.send("SERVEERRR");
