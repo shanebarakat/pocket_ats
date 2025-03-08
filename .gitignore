@@ -1,0 +1,29 @@
+# Ignore node_modules (large dependency folder)
+node_modules/
+
+# Ignore environment variables (sensitive data)
+.env
+
+# Ignore logs
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+debug.log
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore package-lock.json if you don’t want it in the repo
+package-lock.json
+
+# Ignore VS Code settings (if using VS Code)
+.vscode/
+
+# Ignore build and cache folders
+dist/
+build/
+.cache/
+
+# Ignore uploads (if any)
+uploads/

@@ -1,0 +1,22 @@
+{
+  "name": "pocket_ats",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "parse": "^6.0.0",
+    "pdf": "^0.1.0",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.13.3"
+  }
+}
