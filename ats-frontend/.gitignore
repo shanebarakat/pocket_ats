@@ -1,0 +1,59 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+pnpm-lock.yaml
+
+# Build files
+dist/
+build/
+.vite/
+.vitepress/
+.next/
+out/
+.cache/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor-specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Python virtual environment (for AI-related dependencies)
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Misc
+*.bak
+*.tmp
+*.swp
+*.lock
+coverage/
+public/
