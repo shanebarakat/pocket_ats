@@ -222,9 +222,9 @@ function App() {
 
         {results && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
-            {renderResultBox('Keyword Matching', results.keywordMatching)}
-            {renderResultBox('TF-IDF', results.tfidf)}
-            {renderResultBox('Semantic Search', results.semanticSearch)}
+            {renderResultBox('Keyword Matching', results.keywordScore)}
+            {renderResultBox('TF-IDF', results.tfidfScore)}
+            {renderResultBox('Semantic Search', results.semanticScore)}
           </Box>
         )}
       </Container>
