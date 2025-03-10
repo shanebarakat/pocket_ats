@@ -21,6 +21,74 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false },
 });
 
+
+router.post("/explain", upload.single("resume"), async (req, res) => {
+    const { jobDescription, semanticScore, tfidfScore, keywordScore } = req.body;
+
+    if (!req.file || !jobDescription || semanticScore === undefined || tfidfScore === undefined || keywordScore === undefined) {
+        return res.status(400).json({ error: "Resume, job description, and scores are required!" });
+    }
+
+    let resumeText = "";
+
+    if (req.file.mimetype === "application/pdf") {
+        try {
+            const pdfData = await pdfParse(req.file.buffer);
+            resumeText = pdfData.text;
+        } catch (err) {
+            return res.status(500).json({ error: "Error processing PDF file." });
+        }
+    } else if (req.file.mimetype === "text/plain") {
+        resumeText = req.file.buffer.toString("utf-8");
+    } else {
+        return res.status(400).json({ error: "Only PDF and TXT resumes are supported!" });
+    }
+
+    const explanation = await generateExplanation(jobDescription, resumeText, semanticScore, tfidfScore, keywordScore);
+    res.json({ explanation });
+});
+
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+async function generateExplanation(jobDescription, resumeText, semanticScore, tfidfScore, keywordScore) {
+    try {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("❌ GEMINI_API_KEY is missing!");
+            return "API key is missing.";
+        }
+
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+
+        const prompt = `You are an AI Resume Reviewer. After using the amazing tool: Pocket-ATS, the user got the following scores out of 100:
+        
+        keywordScore (checking if words match between resume and job description): ${keywordScore}
+        tfidfScore (using a tfidf system to handle natural language to do the same thing): ${tfidfScore}
+        semanticScore (LLMs determining if a candidate is good): ${semanticScore}
+        
+        Those scores are determined by this job description and resume:
+        Job Description: ${jobDescription}
+        Resume: ${resumeText}
+        
+        Provide an in-depth explanation of why these scores were given and potential changes to the resume text that could improve their score. Be specific and detailed. Use first person and get straight to the point without an introduction.`;
+
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        const text = response.text();
+        return text;
+    } catch (error) {
+        console.error("❌ Gemini API Error:", error);
+        return "Error generating explanation.";
+    }
+}
+
+
+
+
+
+
+
 // API Endpoint: Analyze Resume Against Job Description
 router.post("/analyze", upload.single("resume"), async (req, res) => {
     const { jobDescription } = req.body;
@@ -81,7 +149,7 @@ router.post("/analyze", upload.single("resume"), async (req, res) => {
     }
 });
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 
 async function computeSemanticSimilarity(resumeText, jobDescription) {
     try {
@@ -107,8 +175,8 @@ async function computeSemanticSimilarity(resumeText, jobDescription) {
 
         // ✅ FIXED: Proper Response Handling
         const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = await response.text();
+        const response = result.response;
+        const text = response.text();
 
         console.log("🔍 Gemini API Response:", text); // Debugging Log
 
@@ -159,5 +227,18 @@ function tfidfScoring(resume, job) {
 
     return Math.round((totalScore / keywords.length) * 100);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports = router;

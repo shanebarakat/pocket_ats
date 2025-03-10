@@ -36,6 +36,7 @@ function App() {
   const [isDragging, setIsDragging] = useState(false);
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState(null);
+  const [explanation, setExplanation] = useState('');
 
   const handleFileChange = (e) => {
     if (e.target.files?.[0]) {
@@ -56,7 +57,6 @@ function App() {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    
     if (e.dataTransfer.files?.[0]) {
       setResume(e.dataTransfer.files[0]);
     }
@@ -83,6 +83,41 @@ function App() {
     }
   };
 
+  const handleGetExplanation = async (e) => {
+    e.preventDefault();
+
+    if (!resume) {
+      alert('Please upload a resume!');
+      return;
+    }
+    // Use FormData so that the resume file is properly sent
+    const formData = new FormData();
+    formData.append('resume', resume);
+    formData.append('jobDescription', jobDescription);
+    // Append the scores too
+    formData.append('tfidfScore', results?.tfidfScore);
+    formData.append('keywordScore', results?.keywordScore);
+    formData.append('semanticScore', results?.semanticScore);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/ats/explain', {
+        method: 'POST',
+        body: formData, // Let the browser set the multipart boundary automatically
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // Set the explanation from the API response.
+      setExplanation(data.explanation);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -102,6 +137,12 @@ function App() {
       <Typography variant="h6" sx={{ mb: 1 }}>{title}</Typography>
       <Typography variant="h4" sx={{ color: getColor(score) }}>{score}</Typography>
       <Typography variant="body2" sx={{ mt: 1 }}>Good Score: 75+</Typography>
+    </Box>
+  );
+
+  const renderExplanationBox = (explanationText) => (
+    <Box sx={{ mt: 4, p: 2, border: '1px solid', borderColor: 'grey.300', borderRadius: 2 }}>
+      <Typography variant="body1">{explanationText}</Typography>
     </Box>
   );
 
@@ -153,12 +194,10 @@ function App() {
               textAlign: 'center',
               border: '2px dashed',
               borderColor: isDragging ? 'primary.main' : resume ? 'success.main' : 'grey.300',
-              bgcolor: isDragging || resume ? 'grey.50' : 'transparent',
+              bgcolor: (isDragging || resume) ? 'grey.50' : 'transparent',
               transition: 'all 0.3s ease',
               cursor: 'pointer',
-              '&:hover': {
-                borderColor: 'primary.main',
-              }
+              '&:hover': { borderColor: 'primary.main' }
             }}
           >
             <Box component="label" htmlFor="resume-upload">
@@ -182,12 +221,7 @@ function App() {
                   </>
                 )}
               </Box>
-              <VisuallyHiddenInput
-                id="resume-upload"
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={handleFileChange}
-              />
+              <VisuallyHiddenInput id="resume-upload" type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} />
             </Box>
           </Paper>
 
@@ -208,12 +242,7 @@ function App() {
               variant="contained"
               size="large"
               startIcon={<Send />}
-              sx={{
-                borderRadius: 28,
-                px: 4,
-                py: 1.5,
-                textTransform: 'none'
-              }}
+              sx={{ borderRadius: 28, px: 4, py: 1.5, textTransform: 'none' }}
             >
               Analyze Resume
             </Button>
@@ -221,10 +250,26 @@ function App() {
         </form>
 
         {results && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', mt: 8 }}>
             {renderResultBox('Keyword Matching', results.keywordScore)}
             {renderResultBox('TF-IDF', results.tfidfScore)}
             {renderResultBox('Semantic Search', results.semanticScore)}
+            <Button
+              type="button"
+              variant="contained"
+              size="large"
+              startIcon={<Send />}
+              onClick={handleGetExplanation}
+              sx={{ borderRadius: 28, px: 4, py: 1.5, textTransform: 'none', m: 1 }}
+            >
+              Improve with AI
+            </Button>
+          </Box>
+        )}
+
+        {explanation && (
+          <Box sx={{ mt: 8 }}>
+            {renderExplanationBox(explanation)}
           </Box>
         )}
       </Container>
@@ -234,35 +279,25 @@ function App() {
         <DialogContent>
           <DialogContentText>
             <strong>Pocket ATS</strong> helps you analyze how well your resume matches a job description using three advanced methods used in Applicant Tracking Systems (ATS).
-
             <br /><br />
-
             <strong>🔍 How It Works</strong><br />
             <strong>1️⃣ Keyword Matching</strong> – Finds exact words from the job description in your resume.<br />
             ✅ Used by <strong>Workday, Greenhouse, Taleo</strong>.<br />
             ❌ Can miss synonyms and be tricked by keyword stuffing.
-
             <br /><br />
-
             <strong>2️⃣ TF-IDF (Term Frequency-Inverse Document Frequency)</strong> – Identifies key terms based on importance.<br />
             ✅ Used by <strong>Lever, iCIMS</strong>.<br />
             ❌ Still lacks deep understanding of meaning.
-
             <br /><br />
-
             <strong>3️⃣ Semantic Search (AI Matching)</strong> – Uses AI to understand meaning & intent, not just words.<br />
             ✅ Used by <strong>LinkedIn Recruiter, HireVue, Google Cloud Talent</strong>.<br />
             ❌ More computationally expensive but highly accurate.
-
             <br /><br />
-
             <strong>Pocket ATS combines all three methods</strong> to give you a comprehensive match score and help optimize your resume!
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Close
-          </Button>
+          <Button onClick={handleClose} color="primary">Close</Button>
         </DialogActions>
       </Dialog>
     </Box>
