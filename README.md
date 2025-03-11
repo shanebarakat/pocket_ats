@@ -1,4 +1,4 @@
-# 🚀 Pocket ATS
+# 🚀 Pocket ATS (Still in development)
 
 Pocket ATS is an AI-powered web application that analyzes resumes against job descriptions to determine how effectively they match. It leverages three different algorithms used by real-world Applicant Tracking Systems (ATS), helping users optimize resumes for better hiring outcomes.
 
