@@ -14,6 +14,7 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Slide,
   styled
 } from '@mui/material';
 import { FileUp, Send, FileCheck, Info } from 'lucide-react';
@@ -31,12 +32,71 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 function App() {
+  const [started, setStarted] = useState(false);
   const [resume, setResume] = useState(null);
   const [jobDescription, setJobDescription] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState(null);
   const [explanation, setExplanation] = useState('');
+
+  // LANDING PAGE: When not started show a large title with stats and a get started btn.
+  const renderLanding = () => (
+    <Box sx={{ textAlign: 'center', mt: 8 }}>
+      <Typography variant="h1" sx={{ fontWeight: 700, mb: 1 }}>
+        Pocket ATS
+      </Typography>
+      <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
+        The Open Source Resume Improvement System
+      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+        <Box sx={{ p: 2, border: '1px solid grey', borderRadius: 2, m: 1, minWidth: '150px' }}>
+          <Typography variant="h4">150+</Typography>
+          <Typography variant="body1">Resumes Analyzed</Typography>
+        </Box>
+        <Box sx={{ p: 2, border: '1px solid grey', borderRadius: 2, m: 1, minWidth: '150px' }}>
+          <Typography variant="h4">100+</Typography>
+          <Typography variant="body1">Resumes Improved with AI</Typography>
+        </Box>
+        <Box sx={{ p: 2, border: '1px solid grey', borderRadius: 2, m: 1, minWidth: '150px' }}>
+          <Typography variant="h4">50%</Typography>
+          <Typography variant="body1">Interview Selection Probability</Typography>
+        </Box>
+      </Box>
+      <Button 
+        variant="contained" 
+        size="large" 
+        onClick={() => setStarted(true)}
+        sx={{ borderRadius: 28, px: 4, py: 1.5, textTransform: 'none' }}
+      >
+        Get Started
+      </Button>
+      <Button 
+        variant="contained" 
+        size="large" 
+        onClick={handleClickOpen}  // <-- updated to open dialog
+        sx={{ borderRadius: 28, px: 4, py: 1.5, textTransform: 'none' }}
+      >
+        How It Works
+      </Button>
+    </Box>
+  );
+
+  // FORM HEADER when started is true (title shrinks and moves higher)
+  const renderHeader = () => (
+    <Box sx={{ textAlign: 'center', mt: 2, mb: 4 }}>
+      <Typography variant="h4" sx={{ fontWeight: 600 }}>
+        Pocket ATS
+      </Typography>
+      <Typography variant="h6" color="text.secondary">
+        Will Your Resume Pass?
+      </Typography>
+    </Box>
+  );
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files?.[0]) {
@@ -90,11 +150,9 @@ function App() {
       alert('Please upload a resume!');
       return;
     }
-    // Use FormData so that the resume file is properly sent
     const formData = new FormData();
     formData.append('resume', resume);
     formData.append('jobDescription', jobDescription);
-    // Append the scores too
     formData.append('tfidfScore', results?.tfidfScore);
     formData.append('keywordScore', results?.keywordScore);
     formData.append('semanticScore', results?.semanticScore);
@@ -102,15 +160,13 @@ function App() {
     try {
       const response = await fetch('http://localhost:5000/api/ats/explain', {
         method: 'POST',
-        body: formData, // Let the browser set the multipart boundary automatically
+        body: formData,
       });
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
       const data = await response.json();
-      // Set the explanation from the API response.
       setExplanation(data.explanation);
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     } catch (error) {
@@ -118,10 +174,7 @@ function App() {
     }
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
+  
   const handleClose = () => {
     setOpen(false);
   };
@@ -142,12 +195,12 @@ function App() {
 
   const renderExplanationBox = (explanationText) => (
     <Box sx={{ mt: 4, p: 2, border: '1px solid', borderColor: 'grey.300', borderRadius: 2 }}>
-      <Typography variant="body1">{explanationText}</Typography>
+      <Typography variant="body1" dangerouslySetInnerHTML={{ __html: explanationText }} />
     </Box>
   );
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'grey.50' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'grey.50', display: 'flex', flexDirection: 'column' }}>
       <AppBar position="fixed" color="inherit" elevation={0} sx={{ 
         backdropFilter: 'blur(20px)',
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -163,117 +216,104 @@ function App() {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="md" sx={{ pt: 12, pb: 8 }}>
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography variant="h2" component="h1" sx={{ 
-            fontWeight: 600,
-            mb: 1,
-            fontSize: { xs: '2.5rem', md: '3.75rem' }
-          }}>
-            Pocket ATS
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Typography variant="h5" color="text.secondary">
-              Will Your Resume Pass?
-            </Typography>
-            <IconButton onClick={handleClickOpen} sx={{ ml: 1 }}>
-              <Info />
-            </IconButton>
-          </Box>
-        </Box>
-
-        <form onSubmit={handleSubmit}>
-          <Paper
-            elevation={0}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            sx={{
-              p: 5,
-              mb: 4,
-              textAlign: 'center',
-              border: '2px dashed',
-              borderColor: isDragging ? 'primary.main' : resume ? 'success.main' : 'grey.300',
-              bgcolor: (isDragging || resume) ? 'grey.50' : 'transparent',
-              transition: 'all 0.3s ease',
-              cursor: 'pointer',
-              '&:hover': { borderColor: 'primary.main' }
-            }}
-          >
-            <Box component="label" htmlFor="resume-upload">
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {resume ? (
-                  <>
-                    <FileCheck size={48} color="#2e7d32" style={{ marginBottom: 16 }} />
-                    <Typography variant="body1" color="text.primary" sx={{ fontWeight: 500 }}>
-                      {resume.name}
-                    </Typography>
-                  </>
-                ) : (
-                  <>
-                    <FileUp size={48} color="#757575" style={{ marginBottom: 16 }} />
-                    <Typography variant="body1" color="text.primary" sx={{ mb: 1 }}>
-                      Drag and drop your resume here, or click to select
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Supports PDF, DOC, DOCX
-                    </Typography>
-                  </>
-                )}
+      <Container maxWidth="md" sx={{ pt: started ? 6 : 12, pb: 8, flex: 1 }}>
+        { !started ? renderLanding() : renderHeader() }
+        { started && (
+          <>
+            <form onSubmit={handleSubmit}>
+              <Paper
+                elevation={0}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                sx={{
+                  p: 5,
+                  mb: 4,
+                  textAlign: 'center',
+                  border: '2px dashed',
+                  borderColor: isDragging ? 'primary.main' : resume ? 'success.main' : 'grey.300',
+                  bgcolor: (isDragging || resume) ? 'grey.50' : 'transparent',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  '&:hover': { borderColor: 'primary.main' }
+                }}
+              >
+                <Box component="label" htmlFor="resume-upload">
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    {resume ? (
+                      <>
+                        <FileCheck size={48} color="#2e7d32" style={{ marginBottom: 16 }} />
+                        <Typography variant="body1" color="text.primary" sx={{ fontWeight: 500 }}>
+                          {resume.name}
+                        </Typography>
+                      </>
+                    ) : (
+                      <>
+                        <FileUp size={48} color="#757575" style={{ marginBottom: 16 }} />
+                        <Typography variant="body1" color="text.primary" sx={{ mb: 1 }}>
+                          Drag and drop your resume here, or click to select
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Supports PDF, DOC, DOCX
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
+                  <VisuallyHiddenInput id="resume-upload" type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} />
+                </Box>
+              </Paper>
+      
+              <TextField
+                fullWidth
+                multiline
+                rows={6}
+                label="Job Description"
+                placeholder="Paste the job description here..."
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                sx={{ mb: 4 }}
+              />
+      
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  startIcon={<Send />}
+                  sx={{ borderRadius: 28, px: 4, py: 1.5, textTransform: 'none' }}
+                >
+                  Analyze Resume
+                </Button>
               </Box>
-              <VisuallyHiddenInput id="resume-upload" type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} />
-            </Box>
-          </Paper>
-
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            label="Job Description"
-            placeholder="Paste the job description here..."
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            sx={{ mb: 4 }}
-          />
-
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              startIcon={<Send />}
-              sx={{ borderRadius: 28, px: 4, py: 1.5, textTransform: 'none' }}
-            >
-              Analyze Resume
-            </Button>
-          </Box>
-        </form>
-
-        {results && (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', mt: 8 }}>
-            {renderResultBox('Keyword Matching', results.keywordScore)}
-            {renderResultBox('TF-IDF', results.tfidfScore)}
-            {renderResultBox('Semantic Search', results.semanticScore)}
-            <Button
-              type="button"
-              variant="contained"
-              size="large"
-              startIcon={<Send />}
-              onClick={handleGetExplanation}
-              sx={{ borderRadius: 28, px: 4, py: 1.5, textTransform: 'none', m: 1 }}
-            >
-              Improve with AI
-            </Button>
-          </Box>
-        )}
-
-        {explanation && (
-          <Box sx={{ mt: 8 }}>
-            {renderExplanationBox(explanation)}
-          </Box>
-        )}
+            </form>
+      
+            {results && (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', mt: 8 }}>
+                {renderResultBox('Keyword Matching', results.keywordScore)}
+                {renderResultBox('TF-IDF', results.tfidfScore)}
+                {renderResultBox('Semantic Search', results.semanticScore)}
+                <Button
+                  type="button"
+                  variant="contained"
+                  size="large"
+                  startIcon={<Send />}
+                  onClick={handleGetExplanation}
+                  sx={{ borderRadius: 28, px: 4, py: 1.5, textTransform: 'none', m: 1 }}
+                >
+                  Improve with AI
+                </Button>
+              </Box>
+            )}
+      
+            {explanation && (
+              <Box sx={{ mt: 8 }}>
+                {renderExplanationBox(explanation)}
+              </Box>
+            )}
+          </>
+        ) }
       </Container>
-
+      
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>About Pocket ATS</DialogTitle>
         <DialogContent>
@@ -300,8 +340,19 @@ function App() {
           <Button onClick={handleClose} color="primary">Close</Button>
         </DialogActions>
       </Dialog>
+
+      <Box component="footer" sx={{ textAlign: 'center', py: 2, mt: 4, bgcolor: 'grey.200' }}>
+        <Typography variant="body2" color="text.secondary">
+          Pocket ATS - Open Source Resume Improvement System
+        </Typography>
+      </Box>
     </Box>
   );
 }
 
 export default App;
+
+
+  
+
+  

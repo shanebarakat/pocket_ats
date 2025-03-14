@@ -59,7 +59,7 @@ async function generateExplanation(jobDescription, resumeText, semanticScore, tf
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
         const prompt = `You are an AI Resume Reviewer. After using the amazing tool: Pocket-ATS, the user got the following scores out of 100:
         
@@ -71,7 +71,7 @@ async function generateExplanation(jobDescription, resumeText, semanticScore, tf
         Job Description: ${jobDescription}
         Resume: ${resumeText}
         
-        Provide an in-depth explanation of why these scores were given and potential changes to the resume text that could improve their score. Be specific and detailed. Use first person and get straight to the point without an introduction. ALSO DO IT ALL IN MARKDOWN WITH APPROPRIATE LINE BREAKS!`;
+        Provide an in-depth explanation of why these scores were given and potential changes to the resume text that could improve their score. Be specific and detailed. Use first person and get straight to the point without an introduction. ALSO DO IT ALL IN HTML WITH APPROPRIATE LINE BREAKS!`;
 
         const result = await model.generateContent(prompt);
         const response = result.response;
