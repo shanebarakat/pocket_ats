@@ -579,28 +579,48 @@ function App() {
 
   const renderExplanationBox = (explanationText) => (
     <Grow in={!!explanationText} timeout={800}>
-      <StyledPaper sx={{ 
-        mt: 4, 
-        p: 3, 
-        borderLeft: `4px solid ${theme.palette.primary.main}`,
-        backdropFilter: 'blur(10px)',
-        background: 'rgba(30, 30, 30, 0.8)',
-        width: '100%'
-      }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 500, color: 'text.primary' }}>AI Recommendations</Typography>
+      <StyledPaper
+        sx={{
+          mt: 4,
+          p: 3,
+          borderLeft: `4px solid ${theme.palette.primary.main}`,
+          backdropFilter: 'blur(10px)',
+          background: 'rgba(30, 30, 30, 0.8)',
+          width: '100%',
+          maxHeight: '500px',       // Constrains the box height
+          overflowY: 'auto',        // Enables scrolling if content is too tall
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{ mb: 2, fontWeight: 500, color: 'text.primary' }}
+        >
+          AI Recommendations
+        </Typography>
         <Divider sx={{ mb: 2 }} />
-        <Typography 
-          variant="body1" 
+        <Typography
+          variant="body1"
           component="div"
           sx={{
-            '& p': { mb: 2, color: 'text.primary' },
-            '& strong': { color: 'primary.main' }
+          fontFamily: 'monospace',
+            color: 'text.primary',
+            whiteSpace: 'pre-wrap',      // Preserves line breaks while wrapping text
+            wordBreak: 'break-word',     // Breaks long words to prevent horizontal overflow
+            overflowWrap: 'break-word',  // Ensures text wraps properly
+            lineHeight: 1.6,
+            '& strong': { color: 'primary.main' },
           }}
-          dangerouslySetInnerHTML={{ __html: explanationText }} 
+          // Removes <pre> tags and preserves new lines
+          dangerouslySetInnerHTML={{
+            __html: explanationText
+              .replace(/<pre>/g, '')
+              .replace(/<\/pre>/g, '')
+          }}
         />
       </StyledPaper>
     </Grow>
   );
+  
 
   return (
     <ThemeProvider theme={darkTheme}>

@@ -61,21 +61,58 @@ async function generateExplanation(jobDescription, resumeText, semanticScore, tf
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
-        const prompt = `You are an AI Resume Reviewer. After using the amazing tool: Pocket-ATS, the user got the following scores out of 100:
-        
-        keywordScore (checking if words match between resume and job description): ${keywordScore}
-        tfidfScore (using a tfidf system to handle natural language to do the same thing): ${tfidfScore}
-        semanticScore (LLMs determining if a candidate is good): ${semanticScore}
-        
-        Those scores are determined by this job description and resume:
-        Job Description: ${jobDescription}
-        Resume: ${resumeText}
-        
-        Provide an in-depth explanation of why these scores were given and potential changes to the resume text that could improve their score. Be specific and detailed. Use first person and get straight to the point without an introduction. ALSO DO IT ALL IN HTML WITH APPROPRIATE LINE BREAKS!`;
+        const prompt = `You are an AI Resume Reviewer. After using the amazing tool: Pocket-ATS, the user received the following scores out of 100:
+
+keywordScore (checking if words match between the resume and job description): ${keywordScore}  
+tfidfScore (using a TF-IDF system to analyze natural language similarity): ${tfidfScore}  
+semanticScore (LLMs assessing candidate relevance): ${semanticScore}  
+
+These scores were determined based on the following job description and resume:  
+Job Description: ${jobDescription}  
+Resume: ${resumeText}  
+
+Provide an in-depth explanation of why these scores were assigned and suggest specific, detailed improvements to the resume text to increase the scores. Use first-person perspective and get straight to the point without an introduction. Format everything in HTML with appropriate line breaks. Ensure there is no title in the response, and maintain consistent formatting for every output.
+
+The response should follow this format exactly:
+
+<pre>
+<strong>Keyword Score Analysis:</strong><br>
+Your keyword score is ${keywordScore}. This score is based on the number of exact keyword matches between your resume and the job description. <br>
+<strong>Issues:</strong><br>
+- Missing key phrases such as "project management" and "data analytics".<br>
+- Lack of specific technical terms like "SQL", "Python", and "cloud computing".<br>
+<strong>Improvements:</strong><br>
+- Add relevant keywords directly from the job description where applicable.<br>
+- Ensure job titles and responsibilities align with industry-standard terminology.<br>
+
+<strong>TF-IDF Score Analysis:</strong><br>
+Your TF-IDF score is ${tfidfScore}. This measures how relevant the overall wording of your resume is compared to the job description beyond just exact matches.<br>
+<strong>Issues:</strong><br>
+- The wording of certain sections is too general, reducing relevance.<br>
+- Key phrases are present but not in meaningful context.<br>
+<strong>Improvements:</strong><br>
+- Rewrite bullet points to better align with the language of the job description.<br>
+- Use industry-specific jargon to improve contextual alignment.<br>
+
+<strong>Semantic Score Analysis:</strong><br>
+Your semantic score is ${semanticScore}. This score reflects how well your resume aligns with the job description based on AI-powered meaning analysis.<br>
+<strong>Issues:</strong><br>
+- Some experience descriptions lack measurable impact and clarity.<br>
+- Skills section does not sufficiently demonstrate proficiency.<br>
+<strong>Improvements:</strong><br>
+- Use quantifiable achievements in your experience section (e.g., "Increased efficiency by 30% by automating workflows").<br>
+- Highlight practical applications of your skills instead of just listing them.<br>
+
+<strong>Final Recommendations:</strong><br>
+By implementing these changes, your resume will better align with the job description and improve your overall ATS score.<br>
+</pre>`;
+
+
 
         const result = await model.generateContent(prompt);
         const response = result.response;
         const text = response.text();
+        console.log(text);
         return text;
     } catch (error) {
         console.error("❌ Gemini API Error:", error);
