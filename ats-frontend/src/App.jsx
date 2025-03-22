@@ -28,6 +28,7 @@ import {
 } from "@mui/material"
 import { FileUp, Send, FileCheck, Info, ArrowUp, DoorClosedIcon as Close } from "lucide-react"
 import { motion } from "framer-motion"
+import AnimatedDots from "./animated-dots"
 
 // Create dark theme
 const darkTheme = createTheme({
@@ -264,6 +265,7 @@ function App() {
   const [explanation, setExplanation] = useState("")
   const [loading, setLoading] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [animatedDotsVisible, setAnimatedDotsVisible] = useState(true)
 
   const theme = darkTheme
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -285,6 +287,12 @@ function App() {
       top: 0,
       behavior: "smooth",
     })
+  }
+
+  // Handle Get Started button click
+  const handleGetStarted = () => {
+    setAnimatedDotsVisible(false)
+    setStarted(true)
   }
 
   // LANDING PAGE: When not started show a large title with stats and a get started btn.
@@ -368,7 +376,7 @@ function App() {
             <StyledButton
               variant="contained"
               size="large"
-              onClick={() => setStarted(true)}
+              onClick={handleGetStarted}
               color="primary"
               fullWidth={isMobile}
             >
@@ -644,6 +652,9 @@ function App() {
       >
         {/* Interactive Grid Background */}
         <GridBackground />
+
+        {/* Animated Dots Background */}
+        <AnimatedDots visible={animatedDotsVisible} />
 
         <Container
           maxWidth="md"
