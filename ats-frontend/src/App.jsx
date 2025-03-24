@@ -72,6 +72,34 @@ const darkTheme = createTheme({
             width: "100%",
             height: "100%",
           },
+          // Custom scrollbar styles
+          "&::-webkit-scrollbar": {
+            width: "10px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "#1e1e1e",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#333333",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "#555555",
+          },
+          // Apply to all scrollable elements within the app
+          "& *::-webkit-scrollbar": {
+            width: "10px",
+          },
+          "& *::-webkit-scrollbar-track": {
+            background: "#1e1e1e",
+          },
+          "& *::-webkit-scrollbar-thumb": {
+            background: "#333333",
+            borderRadius: "4px",
+          },
+          "& *::-webkit-scrollbar-thumb:hover": {
+            background: "#555555",
+          },
         },
       },
     },
