@@ -2,11 +2,11 @@
 
 Pocket ATS is an AI-powered web application that analyzes resumes against job descriptions to determine how effectively they match. It leverages three different algorithms used by real-world Applicant Tracking Systems (ATS), helping users optimize resumes for better hiring outcomes.
 
-![Screenshot 2025-03-15 211156](https://github.com/user-attachments/assets/59f63005-9fb4-4f65-8501-04ded6a77783)
 
-![Screenshot 2025-03-15 211121](https://github.com/user-attachments/assets/41af201f-c90e-46b5-afe5-53183e17384b)
 
-![Screenshot 2025-03-15 211132](https://github.com/user-attachments/assets/6e9cc222-75d6-483f-93b4-97268a60096f)
+
+https://github.com/user-attachments/assets/e4ea46ea-803e-42db-a6c7-428e46379567
+
 
 ## 📌 Overview
 
@@ -17,8 +17,6 @@ Pocket ATS processes resumes through three distinct algorithms:
 - **Semantic Search (Gemini AI)**: Utilizes AI to understand the underlying meaning and context, evaluating matches beyond simple keywords.
 
 By combining these methods, Pocket ATS provides comprehensive insights into resume effectiveness.
-
-
 
 
 ## 🌐 Frontend
