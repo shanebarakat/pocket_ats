@@ -115,6 +115,7 @@ const darkTheme = createTheme({
   },
 })
 
+
 // Interactive Grid Background Component
 const GridBackground = () => {
   const canvasRef = useRef(null)
@@ -477,7 +478,8 @@ function App() {
     formData.append("jobDescription", jobDescription)
 
     try {
-      const response = await fetch("http://localhost:5000/api/ats/analyze", {
+      const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+      const response = await fetch(`${BACKEND_URL}/api/ats/analyze`, {
         method: "POST",
         body: formData,
       })
@@ -498,6 +500,7 @@ function App() {
       alert("Please upload a resume!")
       return
     }
+    const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
 
     setLoading(true)
     const formData = new FormData()
@@ -508,7 +511,7 @@ function App() {
     formData.append("semanticScore", results?.semanticScore)
 
     try {
-      const response = await fetch("http://localhost:5000/api/ats/explain", {
+      const response = await fetch(`${BACKEND_URL}/api/ats/explain`, {
         method: "POST",
         body: formData,
       })

@@ -11,15 +11,24 @@ require("dotenv").config();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// PostgreSQL Connection (Using Supabase)
-const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-    ssl: { rejectUnauthorized: false },
-});
+let pool;
+
+function getPool() {
+    if (!pool) {
+        const connectionString = process.env.DATABASE_URL;
+        if (!connectionString) {
+            throw new Error("❌ DATABASE_URL is missing!");
+        }
+
+        pool = new Pool({
+            connectionString,
+            ssl: { rejectUnauthorized: false },
+        });
+    }
+
+    return pool;
+}
+
 
 
 router.post("/explain", upload.single("resume"), async (req, res) => {
@@ -159,7 +168,7 @@ router.post("/analyze", upload.single("resume"), async (req, res) => {
         const tfidfScore = tfidfScoring(resumeText, jobDescription);
 
         // Store data in PostgreSQL (without embeddings)
-        await pool.query(
+        await getPool().query(
             `INSERT INTO ats_results 
             (job_description, resume_text, resume_url, keyword_score, tfidf_score, semantic_score) 
             VALUES ($1, $2, $3, $4, $5, $6)`,

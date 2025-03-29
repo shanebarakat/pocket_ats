@@ -16,6 +16,7 @@
     "@mui/material": "^6.4.7",
     "axios": "^1.8.2",
     "chart.js": "^4.4.8",
+    "framer-motion": "^12.6.2",
     "lucide-react": "^0.479.0",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
