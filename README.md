@@ -5,7 +5,11 @@ Pocket ATS is an AI-powered web application that analyzes resumes against job de
 
 
 
-https://github.com/user-attachments/assets/e4ea46ea-803e-42db-a6c7-428e46379567
+
+
+https://github.com/user-attachments/assets/b9177231-34b4-4470-92fe-fd814e5dda70
+
+
 
 
 ## 📌 Overview
